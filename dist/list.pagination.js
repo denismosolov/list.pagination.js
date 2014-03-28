@@ -440,9 +440,6 @@ var classes = require('classes'),
 module.exports = function(options) {
     options = options || {};
 
-    var pagingList,
-        list;
-
     var refresh = function() {
         var item,
             l = list.matchingItems.length,
@@ -456,57 +453,26 @@ module.exports = function(options) {
 
         right = pages - right;
 
-        pagingList.clear();
-        for (var i = 1; i <= pages; i++) {
-            var className = (currentPage === i) ? "active" : "";
-
-            //console.log(i, left, right, currentPage, (currentPage - innerWindow), (currentPage + innerWindow), className);
-
-            if (is.number(i, left, right, currentPage, innerWindow)) {
-                item = pagingList.add({
-                    page: i,
-                    dotted: false
-                })[0];
-                if (className) {
-                    classes(item.elm).add(className);
-                }
-                addEvent(item.elm, i, page);
-            } else if (is.dotted(i, left, right, currentPage, innerWindow, pagingList.size())) {
-                item = pagingList.add({
-                    page: "...",
-                    dotted: true
-                })[0];
-                classes(item.elm).add("disabled");
-            }
+        var paginationDOM = document.querySelector('.' + options.paginationClass);
+        if (! paginationDOM) {
+            return;
         }
-    };
-
-    var is = {
-        number: function(i, left, right, currentPage, innerWindow) {
-           return this.left(i, left) || this.right(i, right) || this.innerWindow(i, currentPage, innerWindow);
-        },
-        left: function(i, left) {
-            return (i <= left);
-        },
-        right: function(i, right) {
-            return (i > right);
-        },
-        innerWindow: function(i, currentPage, innerWindow) {
-            return ( i >= (currentPage - innerWindow) && i <= (currentPage + innerWindow));
-        },
-        dotted: function(i, left, right, currentPage, innerWindow, currentPageItem) {
-            return this.dottedLeft(i, left, right, currentPage, innerWindow) || (this.dottedRight(i, left, right, currentPage, innerWindow, currentPageItem));
-        },
-        dottedLeft: function(i, left, right, currentPage, innerWindow) {
-            return ((i == (left + 1)) && !this.innerWindow(i, currentPage, innerWindow) && !this.right(i, right));
-        },
-        dottedRight: function(i, left, right, currentPage, innerWindow, currentPageItem) {
-            if (pagingList.items[currentPageItem-1].values().dotted) {
-                return false;
-            } else {
-                return ((i == (right)) && !this.innerWindow(i, currentPage, innerWindow) && !this.right(i, right));
+        paginationDOM.innerHTML = "<span class='" + options.paginationShowMoreClass + "'>Show More</span><span>" + options.paginationSeparator + "</span><span class='" + options.paginationShowAllClass + "'>Show All</span>";
+        if (l <= page) {
+            for(var i=0;i<paginationDOM.childNodes.length;i++) {
+                paginationDOM.childNodes[i].style.display = 'none';
             }
+            return;
         }
+        
+        events.bind(paginationDOM.childNodes[0], 'click', function() {
+            var itemsCount = (index + 1) * page;
+            list.show(1, itemsCount);
+        });
+
+        events.bind(paginationDOM.childNodes[paginationDOM.childNodes.length - 1], 'click', function() {
+            list.show(1, list.matchingItems.length);
+        });
     };
 
     var addEvent = function(elm, i, page) {
@@ -518,13 +484,12 @@ module.exports = function(options) {
     return {
         init: function(parentList) {
             list = parentList;
-            pagingList = new List(list.listContainer.id, {
-                listClass: options.paginationClass || 'pagination',
-                item: "<li><a class='page' href='javascript:function Z(){Z=\"\"}Z()'></a></li>",
-                valueNames: ['page', 'dotted'],
-                searchClass: 'pagination-search-that-is-not-supposed-to-exist',
-                sortClass: 'pagination-sort-that-is-not-supposed-to-exist'
-            });
+
+            options.paginationClass = options.paginationClass || 'pagination';
+            options.paginationShowMoreClass = options.paginationShowMoreClass || 'listjs-pagination-show-more';
+            options.paginationShowAllClass = options.paginationShowAllClass || 'listjs-pagination-show-all';
+            options.paginationSeparator = options.paginationSeparator || '|';
+
             list.on('updated', refresh);
             refresh();
         },
@@ -552,7 +517,7 @@ require.alias("component-indexof/index.js", "indexof/index.js");
 require.alias("list.pagination.js/index.js", "list.pagination.js/index.js");if (typeof exports == "object") {
   module.exports = require("list.pagination.js");
 } else if (typeof define == "function" && define.amd) {
-  define(function(){ return require("list.pagination.js"); });
+  define([], function(){ return require("list.pagination.js"); });
 } else {
   this["ListPagination"] = require("list.pagination.js");
 }})();
