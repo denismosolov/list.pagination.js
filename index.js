@@ -21,7 +21,7 @@ module.exports = function(options) {
         if (! paginationDOM) {
             return;
         }
-        paginationDOM.innerHTML = "<span class='" + options.paginationShowMoreClass + "'>Show More</span><span>" + options.paginationSeparator + "</span><span class='" + options.paginationShowAllClass + "'>Show All</span>";
+        paginationDOM.innerHTML = "<span class='" + options.paginationShowMoreClass + "'>"+options.paginationShowMoreTitle+"</span><span>" + options.paginationSeparator + "</span><span class='" + options.paginationShowAllClass + "'>" + options.paginationShowAllTitle + "</span>";
         if (l <= page) {
             for(var i=0;i<paginationDOM.childNodes.length;i++) {
                 paginationDOM.childNodes[i].style.display = 'none';
@@ -53,7 +53,9 @@ module.exports = function(options) {
             options.paginationShowMoreClass = options.paginationShowMoreClass || 'listjs-pagination-show-more';
             options.paginationShowAllClass = options.paginationShowAllClass || 'listjs-pagination-show-all';
             options.paginationSeparator = options.paginationSeparator || '|';
-
+            options.paginationShowMoreTitle = options.paginationShowMoreTitle || 'Show More';
+            options.paginationShowAllTitle = options.paginationShowAllTitle || 'Show All';
+            
             list.on('updated', refresh);
             refresh();
         },

@@ -14,6 +14,10 @@ paginationShowAllClass: 'listjs-pagination-show-all'
 
 paginationSeparator: '|'
 
+paginationShowMoreTitle: 'Show More'
+
+paginationShowAllTitle: 'Show All'
+
 ## Contribute
 Read the guide at [Listjs.com/overview/contribute](http://listjs.com/overview/contribute).
 
